@@ -1,0 +1,22 @@
+POST http://localhost:80/api/item
+Content-Type: application/x-www-form-urlencoded
+
+id=99&content=new-element
+
+###
+GET http://localhost:8080/users
+
+###
+
+GET http://localhost:8080/users/0
+
+###
+
+POST http://localhost:8080/users/users
+
+###
+
+DELETE http://localhost:8080/users/0
+###
+
+<> 2021-09-23T014730.200.txt

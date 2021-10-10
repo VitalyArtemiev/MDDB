@@ -1,0 +1,14 @@
+GET http://localhost:8080/users/{id}
+
+###
+
+GET http://localhost:8080/users
+
+<> 2021-09-23T014730.200.txt
+
+###
+
+GET http://localhost:8080/users
+
+###
+
