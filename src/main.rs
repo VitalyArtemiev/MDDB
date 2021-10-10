@@ -1,5 +1,6 @@
 mod handlers;
 mod schema;
+mod models;
 
 #[macro_use]
 extern crate diesel;
