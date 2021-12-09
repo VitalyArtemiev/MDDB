@@ -1,24 +1,35 @@
-mod handlers;
-mod schema;
-mod models;
-
 #[macro_use]
 extern crate diesel;
 
-use diesel::prelude::*;
-//use diesel::r2d2::{self, ConnectionManager};
-
+use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
+use std::env;
+use dotenv::dotenv;
 
-use actix_web::{App, HttpRequest, HttpResponse, HttpServer, Responder, Result, http::StatusCode, get, post, web, dev::ServiceRequest, Error};
-use std::fs::File;
+use actix_web::{
+    App, dev::ServiceRequest, Error, get, http::StatusCode, HttpRequest, HttpResponse, HttpServer, post,
+    Responder, Result, web,
+};
+use diesel::associations::HasTable;
+use diesel::prelude::*;
+use diesel::r2d2::{self, ConnectionManager};
+
+use crate::schema::users::dsl::users;
+
+use self::models::*;
+
+mod handlers;
+mod models;
+mod schema;
 
 #[get("/")]
 async fn index(req: HttpRequest) -> Result<HttpResponse> {
     println!("{:?}", req);
 
-    let path: PathBuf = "/home/vitaly/dev/HomeWebPage/rundir/index.html".parse().unwrap();
+    let path: PathBuf = "/home/vitaly/dev/HomeWebPage/rundir/index.html"
+        .parse()
+        .unwrap();
 
     let mut file = File::open("/home/vitaly/dev/HomeWebPage/rundir/index.html")?;
     let mut contents = String::new();
@@ -55,18 +66,30 @@ async fn manual_hello() -> impl Responder {
 async fn main() -> std::io::Result<()> {
     let address;
     if cfg!(debug_assertions) {
-        address = "127.0.0.1:8080"
+        address = "127.0.0.1:8080";
     } else {
         address = "127.0.0.1:80"
     }
 
-    let database_url = "postgres://medical:1-apple-day@192.168.88.235:5432/mdb";
-    //let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    dotenv().ok();
+
+    //let database_url = "postgres://medical:1-apple-day@192.168.88.235:5432/mdb";
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let gen_admin: bool = env::var("GEN_ADMIN").is_ok();
+
+    if gen_admin {
+        println!("Due to env flag, new admin will be generated if none are present")
+    }
+
+    let pool =
+        r2d2::Pool::new(ConnectionManager::<PgConnection>::new(&database_url)).expect(&format!(
+            "DB connection pool creation failed, DB URL: {}",
+            database_url
+        ));
 
     // create db connection pool
-    PgConnection::establish(&database_url)
-        .expect(&format!("Error connecting to {}", database_url));
 
+    //users::table.filter();
 
     HttpServer::new(|| {
         App::new()
@@ -79,7 +102,7 @@ async fn main() -> std::io::Result<()> {
             .route("/users", web::post().to(handlers::add_user))
             .route("/users/{id}", web::delete().to(handlers::delete_user))
     })
-        .bind(address)?
-        .run()
-        .await
+    .bind(address)?
+    .run()
+    .await
 }

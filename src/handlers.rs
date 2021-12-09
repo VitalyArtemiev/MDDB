@@ -1,6 +1,8 @@
-use actix_web::Responder;
+use actix_web::*;
+use diesel::PgConnection;
+use diesel::r2d2::{ConnectionManager, Pool};
 
-pub async fn get_users() -> impl Responder {
+pub async fn get_users(db: web::Data<Pool<ConnectionManager<PgConnection>>>) -> impl Responder {
     format!("hello from get users")
 }
 
