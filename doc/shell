@@ -1,0 +1,6 @@
+diesel migration generate regular
+diesel migration run
+diesel migration revert
+diesel print-schema
+diesel_ext
+

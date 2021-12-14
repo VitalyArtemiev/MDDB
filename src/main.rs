@@ -1,15 +1,18 @@
 #[macro_use]
 extern crate diesel;
 
+use dotenv::dotenv;
+use std::env;
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
-use std::env;
-use dotenv::dotenv;
 
+use crate::handlers::InputUser;
+use crate::schema_db_enum::User_role;
+use crate::schema_db_enum::User_role::Admin;
 use actix_web::{
-    App, dev::ServiceRequest, Error, get, http::StatusCode, HttpRequest, HttpResponse, HttpServer, post,
-    Responder, Result, web,
+    dev::ServiceRequest, get, http::StatusCode, post, web, App, Error, HttpRequest, HttpResponse,
+    HttpServer, Responder, Result,
 };
 use diesel::associations::HasTable;
 use diesel::prelude::*;
@@ -22,6 +25,7 @@ use self::models::*;
 mod handlers;
 mod models;
 mod schema;
+mod schema_db_enum;
 
 #[get("/")]
 async fn index(req: HttpRequest) -> Result<HttpResponse> {
@@ -75,11 +79,8 @@ async fn main() -> std::io::Result<()> {
 
     //let database_url = "postgres://medical:1-apple-day@192.168.88.235:5432/mdb";
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let gen_admin: bool = env::var("GEN_ADMIN").is_ok();
 
-    if gen_admin {
-        println!("Due to env flag, new admin will be generated if none are present")
-    }
+    // create db connection pool
 
     let pool =
         r2d2::Pool::new(ConnectionManager::<PgConnection>::new(&database_url)).expect(&format!(
@@ -87,9 +88,16 @@ async fn main() -> std::io::Result<()> {
             database_url
         ));
 
-    // create db connection pool
+    if env::var("GEN_ADMIN").is_ok() {
+        println!("Due to env flag, new admin will be generated if none are present");
 
-    //users::table.filter();
+        handlers::add_user(
+            pool.get().unwrap(),
+            "admin".to_string(),
+            User_role::Admin,
+            env::var("GEN_ADMIN").unwrap(),
+        ).expect("Failed to create new admin");
+    }
 
     HttpServer::new(|| {
         App::new()
@@ -97,10 +105,16 @@ async fn main() -> std::io::Result<()> {
             //.service(dynpage)
             .service(echo)
             .route("/hey", web::get().to(manual_hello))
-            .route("/users", web::get().to(handlers::get_users))
-            .route("/users/{id}", web::get().to(handlers::get_user_by_id))
-            .route("/users", web::post().to(handlers::add_user))
-            .route("/users/{id}", web::delete().to(handlers::delete_user))
+            .route("/users", web::get().to(handlers::handle_get_users))
+            .route(
+                "/users/{id}",
+                web::get().to(handlers::handle_get_user_by_id),
+            )
+            .route("/users", web::post().to(handlers::handle_add_user))
+            .route(
+                "/users/{id}",
+                web::delete().to(handlers::handle_delete_user),
+            )
     })
     .bind(address)?
     .run()

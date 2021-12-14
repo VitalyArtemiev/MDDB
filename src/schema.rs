@@ -37,9 +37,12 @@ table! {
 }
 
 table! {
+    use diesel::types::*;
+    use crate::schema_db_enum::User_roleMapping;
     users (key) {
         key -> Int4,
         login -> Varchar,
+        role -> User_roleMapping,
         salt -> Varchar,
         hash -> Varchar,
     }

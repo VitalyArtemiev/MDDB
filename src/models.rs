@@ -3,8 +3,11 @@
 #![allow(unused)]
 #![allow(clippy::all)]
 
+use serde::Serialize;
 use chrono::NaiveDate;
 use crate::schema::*;
+use crate::User_role;
+
 #[derive(Queryable, Debug, Identifiable)]
 pub struct Document {
     pub id: i32,
@@ -40,11 +43,12 @@ pub struct Patient {
     pub occupation: Option<String>,
 }
 
-#[derive(Queryable, Debug, Identifiable)]
+#[derive(Queryable, Debug, Identifiable, Serialize)]
 #[primary_key(key)]
 pub struct User {
     pub key: i32,
     pub login: String,
+    pub role: User_role,
     pub salt: String,
     pub hash: String,
 }
