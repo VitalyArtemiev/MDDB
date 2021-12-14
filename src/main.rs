@@ -8,8 +8,8 @@ use std::io::Read;
 use std::path::PathBuf;
 
 use crate::handlers::InputUser;
-use crate::schema_db_enum::User_role;
-use crate::schema_db_enum::User_role::Admin;
+
+use crate::schema::sql_types::UserRole;
 use actix_web::{
     dev::ServiceRequest, get, http::StatusCode, post, web, App, Error, HttpRequest, HttpResponse,
     HttpServer, Responder, Result,
@@ -94,9 +94,10 @@ async fn main() -> std::io::Result<()> {
         handlers::add_user(
             pool.get().unwrap(),
             "admin".to_string(),
-            User_role::Admin,
+            UserRole::Admin,
             env::var("GEN_ADMIN").unwrap(),
-        ).expect("Failed to create new admin");
+        )
+        .expect("Failed to create new admin");
     }
 
     HttpServer::new(|| {

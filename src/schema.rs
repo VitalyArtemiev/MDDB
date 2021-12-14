@@ -1,4 +1,16 @@
-table! {
+// @generated automatically by Diesel CLI.
+
+pub mod sql_types {
+    #[derive(diesel::sql_types::SqlType)]
+    #[diesel(postgres_type(name = "user_role"))]
+    pub struct UserRole{
+        Guest,
+        User,
+        Admin
+    };
+}
+
+diesel::table! {
     documents (id) {
         id -> Int4,
         patient_id -> Int4,
@@ -14,7 +26,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     medical_institutions (id) {
         id -> Int4,
         fullname -> Varchar,
@@ -22,7 +34,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     patients (id) {
         id -> Int4,
         first_name -> Varchar,
@@ -36,22 +48,24 @@ table! {
     }
 }
 
-table! {
-    use diesel::types::*;
-    use crate::schema_db_enum::User_roleMapping;
+diesel::table! {
+    use diesel::sql_types::*;
+    use super::sql_types::UserRole;
+
     users (key) {
         key -> Int4,
         login -> Varchar,
-        role -> User_roleMapping,
+        role -> UserRole,
         salt -> Varchar,
         hash -> Varchar,
+        date_pass_changed -> Date,
     }
 }
 
-joinable!(documents -> medical_institutions (institution_id));
-joinable!(documents -> patients (patient_id));
+diesel::joinable!(documents -> medical_institutions (institution_id));
+diesel::joinable!(documents -> patients (patient_id));
 
-allow_tables_to_appear_in_same_query!(
+diesel::allow_tables_to_appear_in_same_query!(
     documents,
     medical_institutions,
     patients,

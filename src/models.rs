@@ -3,10 +3,11 @@
 #![allow(unused)]
 #![allow(clippy::all)]
 
-use serde::Serialize;
-use chrono::NaiveDate;
 use crate::schema::*;
-use crate::User_role;
+use crate::UserRole;
+use chrono::NaiveDate;
+use diesel::sql_types::Date;
+use serde::Serialize;
 
 #[derive(Queryable, Debug, Identifiable)]
 pub struct Document {
@@ -48,7 +49,8 @@ pub struct Patient {
 pub struct User {
     pub key: i32,
     pub login: String,
-    pub role: User_role,
+    pub role: UserRole,
     pub salt: String,
     pub hash: String,
+    pub date_pass_changed: Date,
 }
