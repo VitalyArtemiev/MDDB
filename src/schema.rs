@@ -1,4 +1,7 @@
 table! {
+    use diesel::sql_types::*;
+    use crate::schema_db_enum::*;
+
     documents (id) {
         id -> Int4,
         patient_id -> Int4,
@@ -15,6 +18,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::schema_db_enum::*;
+
     medical_institutions (id) {
         id -> Int4,
         fullname -> Varchar,
@@ -23,6 +29,9 @@ table! {
 }
 
 table! {
+    use diesel::sql_types::*;
+    use crate::schema_db_enum::*;
+
     patients (id) {
         id -> Int4,
         first_name -> Varchar,
@@ -37,14 +46,16 @@ table! {
 }
 
 table! {
-    use diesel::types::*;
-    use crate::schema_db_enum::User_roleMapping;
+    use diesel::sql_types::*;
+    use crate::schema_db_enum::*;
+
     users (key) {
         key -> Int4,
         login -> Varchar,
-        role -> User_roleMapping,
+        role -> User_role,
         salt -> Varchar,
         hash -> Varchar,
+        date_pass_changed -> Date,
     }
 }
 

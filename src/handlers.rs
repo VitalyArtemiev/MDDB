@@ -3,7 +3,7 @@ use diesel::{ExpressionMethods, PgConnection, RunQueryDsl};
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use rand::Rng;
 use serde::{Serialize, Deserialize};
-use crate::schema_db_enum::User_role;
+use crate::schema_db_enum::UserRole;
 use crate::User;
 
 type DBPool = web::Data<Pool<ConnectionManager<PgConnection>>>;
@@ -14,7 +14,7 @@ const POOL_ERR: &str = "Could not get DB connection from pool";
 #[derive(Debug, Serialize, Deserialize)]
 pub struct InputUser {
     pub login: String,
-    pub role: User_role,
+    pub role: UserRole,
     pub password: String,
 }
 
@@ -42,15 +42,13 @@ pub async fn handle_add_user(pool: DBPool, item: web::Json<InputUser>) -> Result
     Ok(HttpResponse::Ok().json(user))
 }
 
-pub fn add_user(dbc: DBConnection, login: String, role: User_role, password: String) -> Result<User, diesel::result::Error> {
+pub fn add_user(dbc: DBConnection, login: String, role: UserRole, password: String) -> Result<User, diesel::result::Error> {
     use crate::schema::users::dsl;
     use rand::{thread_rng, distributions::Alphanumeric};
     use argon2::{hash_encoded, Config};
 
     let salt: String = thread_rng().sample_iter(Alphanumeric).take(16).map(char::from).collect();
     let hash = hash_encoded(password.as_ref(), salt.as_ref(), &Config::default()).unwrap();
-
-    println!("{}", hash);
 
     diesel::insert_into(dsl::users).values((
         dsl::login.eq(login),
