@@ -26,6 +26,7 @@ mod handlers;
 mod models;
 mod schema;
 mod schema_db_enum;
+mod auth;
 
 #[get("/")]
 async fn index(req: HttpRequest) -> Result<HttpResponse> {
@@ -98,11 +99,13 @@ async fn main() -> std::io::Result<()> {
             env::var("GEN_ADMIN").unwrap(),
         )
         .map(|_| println!("Default admin created"))
-        .map_err(|it|println!("Failed to create new admin: {}", it));
+        .map_err(|it|println!("Failed to create new admin: {}", it)).ok();
     }
 
     HttpServer::new(|| {
+        //let auth = Http
         App::new()
+            .wrap()
             .service(index)
             //.service(dynpage)
             .service(echo)
