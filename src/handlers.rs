@@ -1,4 +1,5 @@
 use actix_web::*;
+use actix_web_grants::proc_macro::has_roles;
 use diesel::{ExpressionMethods, PgConnection, RunQueryDsl};
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use rand::Rng;
@@ -40,7 +41,8 @@ pub async fn handle_add_user(pool: DBPool, item: web::Json<InputUser>) -> Result
 
     Ok(HttpResponse::Ok().finish())
 }
-#[actix::allow()]
+
+#[has_roles["admin"]]
 pub fn add_user(dbc: DBConnection, login: String, role: UserRole, password: String) -> Result<User, diesel::result::Error> {
     use crate::schema::users::dsl;
     use rand::{thread_rng, distributions::Alphanumeric};
@@ -49,7 +51,6 @@ pub fn add_user(dbc: DBConnection, login: String, role: UserRole, password: Stri
     let salt: String = thread_rng().sample_iter(Alphanumeric).take(16).map(char::from).collect();
     let hash = hash_encoded(password.as_ref(), salt.as_ref(), &Config::default()).unwrap();
 
-    actix_web::guard
     diesel::insert_into(dsl::users).values((
         dsl::login.eq(login),
         dsl::role.eq(role),

@@ -14,6 +14,7 @@ use actix_web::{
     dev::ServiceRequest, get, http::StatusCode, post, web, App, Error, HttpRequest, HttpResponse,
     HttpServer, Responder, Result,
 };
+use actix_web_grants::GrantsMiddleware;
 use diesel::associations::HasTable;
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
@@ -103,9 +104,8 @@ async fn main() -> std::io::Result<()> {
     }
 
     HttpServer::new(|| {
-        //let auth = Http
         App::new()
-            .wrap()
+            .wrap(GrantsMiddleware::with_extractor(auth::extract_role))
             .service(index)
             //.service(dynpage)
             .service(echo)

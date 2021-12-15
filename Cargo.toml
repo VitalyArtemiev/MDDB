@@ -11,8 +11,10 @@ chrono = { version = "0.4", features =["serde"]}
 serde = "1.0"
 rand = "0.8"
 rust-argon2 = "0.8"
+jwt = "0.15"
 
 dotenv = "0.15"
 actix-web = "3.3"
+actix-web-grants = "2.2"
 diesel = { version = "1.4", features = ["postgres", "r2d2", "chrono"] }
 diesel-derive-enum = { version = "1", features = ["postgres"] }
