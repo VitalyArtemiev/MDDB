@@ -1,5 +1,5 @@
 use actix_web::*;
-use actix_web_grants::proc_macro::has_roles;
+use actix_web_grants::proc_macro::{has_roles};
 use diesel::{ExpressionMethods, PgConnection, RunQueryDsl};
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use rand::Rng;
@@ -27,6 +27,7 @@ pub async fn handle_get_user_by_id(pool: DBPool, user_id: web::Path<u32>) -> Res
     Ok(HttpResponse::Ok().json("handle_get_user_by_id"))
 }
 
+#[has_roles("ADMIN")]
 pub async fn handle_add_user(pool: DBPool, item: web::Json<InputUser>) -> Result<HttpResponse, Error> {
     let dbc = pool.get().expect(POOL_ERR);
 
@@ -42,7 +43,6 @@ pub async fn handle_add_user(pool: DBPool, item: web::Json<InputUser>) -> Result
     Ok(HttpResponse::Ok().finish())
 }
 
-#[has_roles["admin"]]
 pub fn add_user(dbc: DBConnection, login: String, role: UserRole, password: String) -> Result<User, diesel::result::Error> {
     use crate::schema::users::dsl;
     use rand::{thread_rng, distributions::Alphanumeric};
@@ -61,4 +61,26 @@ pub fn add_user(dbc: DBConnection, login: String, role: UserRole, password: Stri
 
 pub async fn handle_delete_user(pool: DBPool, user_id: web::Path<u32>) -> Result<HttpResponse, Error> {
     Ok(HttpResponse::Ok().json("handle_delete_user"))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use actix_web::{http, test};
+
+    #[actix_rt::test]
+    async fn test_index_ok() {
+        let req = test::TestRequest::with_header("content-type", "text/plain").to_http_request();
+
+
+        //let resp = handle_add_user(AuthDetails {}, (), Json()).await;
+        assert_eq!(resp.status(), http::StatusCode::OK);
+    }
+
+    #[actix_rt::test]
+    async fn test_index_not_ok() {
+        let req = test::TestRequest::default().to_http_request();
+        //let resp = index(req).await;
+        assert_eq!(resp.status(), http::StatusCode::BAD_REQUEST);
+    }
 }
