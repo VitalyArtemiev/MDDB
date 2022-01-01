@@ -13,6 +13,8 @@ pub async fn extract_role(req: &ServiceRequest) -> Result<Vec<String>, Error> {
         ]
         )
         .ok_or(ErrorUnauthorized("Auth header not found"))
+
+     //Ok(vec!["ROLE_ADMIN".to_string()])
 }
 
 //use hmac::{Hmac, NewMac};

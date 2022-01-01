@@ -13,10 +13,28 @@ GET http://localhost:8080/users/0
 ###
 
 POST http://localhost:8080/users/users
+Authorization:
+
+
+{
+  "token": "my-secret-token"
+}
+
+> {% client.global.set("auth", response.body.json.token); %}
+
+### Authorization by token, part 2. Use token to authorize.
+POST http://localhost:8080/users
+
+
+auth: 12345679
+
+
 
 ###
 
 DELETE http://localhost:8080/users/0
 ###
+
+
 
 <> 2021-09-23T014730.200.txt

@@ -1,3 +1,66 @@
+POST http://localhost:8080/users
+
+auth: 12345679
+
+<> 2022-01-02T015611.401.txt
+
+###
+
+GET http://localhost:8080/users
+
+<> 2022-01-02T015552.401.txt
+
+###
+
+POST http://localhost:8080/users/users
+Authorization:
+
+{
+  "token": "my-secret-token"
+}
+
+<> 2022-01-02T015543.401.txt
+
+###
+
+POST http://localhost:8080/users
+auth: 12345679
+
+###
+
+POST http://localhost:8080/users
+Authorization: Bearer {{auth}}
+
+<> 2022-01-02T003320.401.txt
+
+###
+
+POST http://localhost:8080/users/users
+
+###
+
+POST http://localhost:8080/users/users
+
+###
+
+POST http://localhost:8080/users/users
+
+<> 2022-01-01T020637.401.txt
+
+###
+
+POST http://localhost:8080/users/users
+
+<> 2022-01-01T020448.401.txt
+
+###
+
+POST http://localhost:8080/users/users
+
+<> 2022-01-01T020332.401.txt
+
+###
+
 GET http://localhost:8080/users/{id}
 
 ###

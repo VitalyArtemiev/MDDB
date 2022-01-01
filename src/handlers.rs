@@ -31,7 +31,7 @@ pub async fn handle_get_user_by_id(pool: DBPool, user_id: web::Path<u32>) -> Res
 pub async fn handle_add_user(pool: DBPool, item: web::Json<InputUser>) -> Result<HttpResponse, Error> {
     let dbc = pool.get().expect(POOL_ERR);
 
-    let InputUser {login , role, password} = item.0;
+    let InputUser {login, role, password} = item.0;
 
     let user = web::block( || add_user(dbc, login, role, password))
         .await

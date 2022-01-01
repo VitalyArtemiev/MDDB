@@ -103,8 +103,8 @@ async fn main() -> std::io::Result<()> {
         .map_err(|it|println!("Failed to create new admin: {}", it)).ok();
     }
 
-    HttpServer::new(|| {
-        App::new()
+    HttpServer::new(move || {
+        App::new().data(pool.clone())
             .wrap(GrantsMiddleware::with_extractor(auth::extract_role))
             .service(index)
             //.service(dynpage)
